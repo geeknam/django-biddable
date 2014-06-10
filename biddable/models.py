@@ -30,12 +30,18 @@ class Bid(models.Model):
 
 class _BiddableManager(models.Manager):
 
+    def __init__(self, model, instance, prefetch_cache_name):
+        self.model = model
+        self.instance = instance
+        self.prefetch_cache_name = prefetch_cache_name
+        self._db = None
+
     @property
     def content_type(self):
         return ContentType.objects.get_for_model(self.instance.__class__)
 
     def get_query_set(self):
-        return super(BiddleManager, self).get_query_set().filter(
+        return self.model.objects.filter(
             content_type=self.content_type, object_id=self.instance.id
         )
 
